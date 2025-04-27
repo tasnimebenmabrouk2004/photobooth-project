@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+ body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-image: url('background-croshet1.gif');
+  background-size: cover;
+  background-position: center;
+}
+
+
+      .main-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      .left-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 320px;
+        height: 600px;
+        border: 2px solid #333;
+        background-color: #f8f8f8;
+        padding: 10px;
+      }
+
+      video {
+        width: 100%;
+        height: 240px;
+        border: 2px solid #333;
+      }
+
+      .controls {
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .controls select,
+      .controls button {
+        padding: 10px;
+        cursor: pointer;
+        margin: 5px;
+        width: 100%;
+      }
+
+      .right-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        width: 320px;
+        height: 600px;
+        border: 2px solid #333;
+        background-color: #fff;
+      }
+
+      .photo-frame-canvas {
+        width: 100%;
+        height: 100%;
+        border: 2px solid #333;
+        background-color: #fff;
+      }
+
+      .download-btn {
+        margin-top: 10px;
+        padding: 12px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+      }
+
+      .download-btn:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="left-container">
+        <h1>Photo Booth</h1>
+        <video id="video" autoplay></video>
+        <div class="controls">
+          <select id="background-select">
+            <option value="#FFD1DC">Pastel Pink</option>
+            <option value="#A7C7E7">Pastel Blue</option>
+            <option value="#D8BFD8">Pastel Purple</option>
+            <option value="#FFFACD">Pastel Yellow</option>
+            <option value="#B0E57C">Pastel Green</option>
+            <option value="#FFDAB9">Pastel Peach</option>
+            <option value="#AAF0D1">Pastel Mint</option>
+          </select>
+          <button id="capture-btn">Capture</button>
+        </div>
+      </div>
+
+      <div class="right-container">
+        <canvas id="photo-canvas" class="photo-frame-canvas" width="320" height="600"></canvas>
+        <button id="download-btn" class="download-btn">Download</button>
+      </div>
+    </div>
+
+    <script>
+      var video = document.getElementById("video");
+      var captureBtn = document.getElementById("capture-btn");
+      var backgroundSelect = document.getElementById("background-select");
+      var downloadBtn = document.getElementById("download-btn");
+      var canvas = document.getElementById("photo-canvas");
+      var context = canvas.getContext("2d");
+      var capturedImages = 0;
+
+     
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        video.srcObject = stream;
+      });
+
+      
+      captureBtn.addEventListener("click", () => {
+        capturePhoto();
+      });
+      function capturePhoto() {
+  if (capturedImages >= 4) {
+    
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    capturedImages = 0;
+  }
+
+
+  var backgroundColor = backgroundSelect.value;
+  var margin = 10;
+
+  var photoHeight = (canvas.height - (3 * margin)) / 4; 
+  
+  if (capturedImages === 0) {
+    context.fillStyle = backgroundColor;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+ 
+  var photoWidth = canvas.width * 0.8;  
+
+  
+  context.drawImage(
+    video,
+    (canvas.width - photoWidth) / 2,  
+    capturedImages * (photoHeight + margin), 
+    photoWidth, 
+    photoHeight
+  );
+
+  capturedImages++;
+  
+}
+
+
+
+
+      
+      downloadBtn.addEventListener("click", () => {
+        var link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = "photo_frame.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>
